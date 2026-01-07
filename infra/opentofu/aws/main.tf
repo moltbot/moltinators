@@ -6,8 +6,38 @@ locals {
   tags = merge(var.tags, { "app" = "clawdinator" })
 }
 
-data "aws_s3_bucket" "image_bucket" {
+resource "aws_s3_bucket" "image_bucket" {
   bucket = var.bucket_name
+  tags   = local.tags
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "image_bucket" {
+  bucket                  = aws_s3_bucket.image_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "image_bucket" {
+  bucket = aws_s3_bucket.image_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "image_bucket" {
+  bucket = aws_s3_bucket.image_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 data "aws_iam_policy_document" "vmimport_assume" {
@@ -34,8 +64,8 @@ data "aws_iam_policy_document" "vmimport" {
       "s3:ListBucket"
     ]
     resources = [
-      data.aws_s3_bucket.image_bucket.arn,
-      "${data.aws_s3_bucket.image_bucket.arn}/*"
+      aws_s3_bucket.image_bucket.arn,
+      "${aws_s3_bucket.image_bucket.arn}/*"
     ]
   }
 
@@ -56,8 +86,13 @@ resource "aws_iam_role_policy" "vmimport" {
   policy = data.aws_iam_policy_document.vmimport.json
 }
 
-data "aws_iam_user" "ci_user" {
-  user_name = var.ci_user_name
+resource "aws_iam_user" "ci_user" {
+  name = var.ci_user_name
+  tags = local.tags
+}
+
+resource "aws_iam_access_key" "ci_user" {
+  user = aws_iam_user.ci_user.name
 }
 
 data "aws_iam_policy_document" "ami_importer" {
@@ -67,7 +102,7 @@ data "aws_iam_policy_document" "ami_importer" {
       "s3:GetBucketLocation",
       "s3:ListBucket"
     ]
-    resources = [data.aws_s3_bucket.image_bucket.arn]
+    resources = [aws_s3_bucket.image_bucket.arn]
   }
 
   statement {
@@ -79,7 +114,7 @@ data "aws_iam_policy_document" "ami_importer" {
       "s3:AbortMultipartUpload",
       "s3:ListMultipartUploadParts"
     ]
-    resources = ["${data.aws_s3_bucket.image_bucket.arn}/*"]
+    resources = ["${aws_s3_bucket.image_bucket.arn}/*"]
   }
 
   statement {
@@ -102,6 +137,6 @@ data "aws_iam_policy_document" "ami_importer" {
 
 resource "aws_iam_user_policy" "ami_importer" {
   name   = "clawdinator-ami-importer"
-  user   = data.aws_iam_user.ci_user.user_name
+  user   = aws_iam_user.ci_user.name
   policy = data.aws_iam_policy_document.ami_importer.json
 }
