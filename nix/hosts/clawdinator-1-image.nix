@@ -9,7 +9,12 @@
   boot.loader.efi.canTouchEfiVariables = false;
   boot.loader.efi.efiSysMountPoint = "/boot";
 
-  networking.useDHCP = true;
+  networking.useDHCP = false;
+  systemd.network.enable = true;
+  systemd.network.networks."10-ethernet" = {
+    matchConfig.Name = "en* eth*";
+    networkConfig.DHCP = "yes";
+  };
   services.openssh.enable = true;
   networking.firewall.enable = false;
 
