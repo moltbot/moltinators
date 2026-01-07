@@ -8,6 +8,7 @@ Operating mode:
 
 Core pieces:
 - AWS AMIs are built from a prebuilt NixOS image (nixos-generators + import-image).
+- AWS EC2 instances are launched from those AMIs via OpenTofu.
 - NixOS modules configure clawdbot + CLAWDINATOR runtime on each host.
 - Shared memory is mounted at a consistent path on all hosts.
 

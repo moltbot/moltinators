@@ -9,7 +9,8 @@ Principles:
 - Latest upstream nix‑clawdbot by default; breaking changes are acceptable.
 
 Stack:
-- AWS AMIs built in CI (nixos-generators + import-image).
+- AWS AMIs built in CI (nixos-generators raw + import-image).
+- AWS EC2 instances launched from those AMIs via OpenTofu.
 - NixOS modules configure Clawdbot and CLAWDINATOR runtime.
 - Shared hive‑mind memory stored on a mounted host volume.
 
@@ -46,10 +47,10 @@ Deploy (automation‑first):
 
 Image-based deploy (only path):
 1) Build a bootstrap image with nixos-generators:
-   - `nix run github:nix-community/nixos-generators -- -f amazon -c nix/hosts/clawdinator-1-image.nix -o dist`
+   - `nix run github:nix-community/nixos-generators -- -f raw -c nix/hosts/clawdinator-1-image.nix -o dist`
 2) Upload the raw image to S3 (private object).
 3) Import into AWS as an AMI (`aws ec2 import-image`).
-4) Launch hosts from the AMI.
+4) Launch hosts from the AMI (OpenTofu `infra/opentofu/aws`).
 5) Re-key agenix secrets to the new host SSH key and sync secrets to `/var/lib/clawd/nix-secrets`.
 6) Run `nixos-rebuild switch --flake /var/lib/clawd/repo#clawdinator-1`.
 

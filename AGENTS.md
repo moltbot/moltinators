@@ -38,10 +38,11 @@ The Zen of ~~Python~~ Clawdbot, ~~by~~ shamelessly stolen from Tim Peters:
 
 Deploy flow (automation-first):
 - Use `devenv.nix` for tooling (nixos-generators, awscli2).
-- Build a bootstrap NixOS image with nixos-generators (amazon) and upload it to S3.
+- Build a bootstrap NixOS image with nixos-generators (raw) and upload it to S3.
   - Use `nix/hosts/clawdinator-1-image.nix` for image builds.
 - CI is preferred: `.github/workflows/image-build.yml` runs build → S3 upload → AMI import.
 - Bootstrap S3 bucket + scoped IAM user + VM Import role with `infra/opentofu/aws` (use homelab-admin creds).
+- Bootstrap AWS instances from the AMI with `infra/opentofu/aws` (set `TF_VAR_ami_id`).
 - Import the image into AWS as an AMI (`aws ec2 import-image`).
 - Grab the host SSH key and add it to `../nix/nix-secrets/secrets.nix`; rekey secrets with agenix.
 - Ensure required secrets exist: `clawdinator-github-app.pem`, `clawdinator-discord-token`, `clawdinator-anthropic-api-key`.
@@ -49,6 +50,22 @@ Deploy flow (automation-first):
 - Ensure `/var/lib/clawd/repo` contains this repo (self-update requires it).
 - Verify systemd services: `clawdinator`, `clawdinator-github-app-token`, `clawdinator-self-update`.
 - Commit and push changes; repo is the source of truth.
+
+Bootstrap (local):
+- Agenix identity is `~/.ssh/id_ed25519` (primary SSH key).
+- Decrypt homelab admin creds:
+  - `RULES=../nix/nix-secrets/secrets.nix agenix -d homelab-admin.age -i ~/.ssh/id_ed25519`
+- OpenTofu env:
+  - `TF_VAR_aws_region=eu-central-1`
+  - `TF_VAR_ami_id=ami-...`
+  - `TF_VAR_ssh_public_key="$(cat ~/.ssh/id_ed25519.pub)"`
+- Run `tofu init` + `tofu apply` in `infra/opentofu/aws`.
+- After apply, update CI secrets from outputs:
+  - `tofu output -raw access_key_id` → `clawdinator-image-uploader-access-key-id.age`
+  - `tofu output -raw secret_access_key` → `clawdinator-image-uploader-secret-access-key.age`
+  - `tofu output -raw bucket_name` → `clawdinator-image-bucket-name.age`
+  - `tofu output -raw aws_region` → `clawdinator-image-bucket-region.age`
+  - Then `gh secret set` for `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET`.
 
 Key principle: mental notes don’t survive restarts — write it to a file.
 

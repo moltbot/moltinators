@@ -20,3 +20,31 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "ami_id" {
+  description = "AMI ID for CLAWDINATOR instances."
+  type        = string
+}
+
+variable "instance_name" {
+  description = "Name tag for the CLAWDINATOR instance."
+  type        = string
+  default     = "clawdinator-1"
+}
+
+variable "instance_type" {
+  description = "EC2 instance type."
+  type        = string
+  default     = "t3.small"
+}
+
+variable "ssh_public_key" {
+  description = "SSH public key for the CLAWDINATOR operator."
+  type        = string
+}
+
+variable "allowed_cidrs" {
+  description = "CIDR ranges allowed to SSH and the gateway."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}

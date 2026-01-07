@@ -140,3 +140,67 @@ resource "aws_iam_user_policy" "ami_importer" {
   user   = aws_iam_user.ci_user.name
   policy = data.aws_iam_policy_document.ami_importer.json
 }
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+resource "aws_key_pair" "operator" {
+  key_name   = "clawdinator-operator"
+  public_key = var.ssh_public_key
+  tags       = local.tags
+}
+
+resource "aws_security_group" "clawdinator" {
+  name        = "clawdinator"
+  description = "CLAWDINATOR access"
+  vpc_id      = data.aws_vpc.default.id
+  tags        = local.tags
+}
+
+resource "aws_security_group_rule" "ssh_ingress" {
+  type              = "ingress"
+  security_group_id = aws_security_group.clawdinator.id
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = var.allowed_cidrs
+}
+
+resource "aws_security_group_rule" "gateway_ingress" {
+  type              = "ingress"
+  security_group_id = aws_security_group.clawdinator.id
+  from_port         = 18789
+  to_port           = 18789
+  protocol          = "tcp"
+  cidr_blocks       = var.allowed_cidrs
+}
+
+resource "aws_security_group_rule" "egress" {
+  type              = "egress"
+  security_group_id = aws_security_group.clawdinator.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_instance" "clawdinator" {
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  subnet_id                   = element(data.aws_subnets.default.ids, 0)
+  vpc_security_group_ids      = [aws_security_group.clawdinator.id]
+  key_name                    = aws_key_pair.operator.key_name
+  associate_public_ip_address = true
+
+  tags = merge(local.tags, {
+    Name = var.instance_name
+  })
+}

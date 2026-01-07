@@ -22,3 +22,18 @@ output "secret_access_key" {
   sensitive   = true
   description = "Use in CI as AWS_SECRET_ACCESS_KEY."
 }
+
+output "instance_id" {
+  value       = aws_instance.clawdinator.id
+  description = "CLAWDINATOR instance ID."
+}
+
+output "instance_public_ip" {
+  value       = aws_instance.clawdinator.public_ip
+  description = "CLAWDINATOR public IP."
+}
+
+output "instance_public_dns" {
+  value       = aws_instance.clawdinator.public_dns
+  description = "CLAWDINATOR public DNS."
+}

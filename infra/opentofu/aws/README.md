@@ -9,6 +9,9 @@ Usage:
 - export AWS_ACCESS_KEY_ID=...
 - export AWS_SECRET_ACCESS_KEY=...
 - export AWS_REGION=eu-central-1
+- export TF_VAR_aws_region=eu-central-1
+- export TF_VAR_ami_id=ami-...
+- export TF_VAR_ssh_public_key="$(cat ~/.ssh/id_ed25519.pub)"
 - tofu init
 - tofu apply
 
@@ -18,6 +21,9 @@ Outputs:
 - `ci_user_name`
 - `access_key_id`
 - `secret_access_key`
+- `instance_id`
+- `instance_public_ip`
+- `instance_public_dns`
 
 CI wiring:
 - Set GitHub Actions secrets:

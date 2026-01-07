@@ -3,7 +3,7 @@ set -euo pipefail
 
 config_path="${CONFIG_PATH:-nix/hosts/clawdinator-1-image.nix}"
 out_dir="${OUT_DIR:-dist}"
-format="${IMAGE_FORMAT:-amazon}"
+format="${IMAGE_FORMAT:-raw}"
 
 if [ -e "${out_dir}" ]; then
   rm -rf "${out_dir}"
