@@ -1,11 +1,7 @@
-{ modulesPath, config, ... }:
-let
-  agenix = builtins.fetchTarball "https://github.com/ryantm/agenix/archive/refs/tags/0.15.0.tar.gz";
-in {
+{ modulesPath, config, ... }: {
   imports = [
     (modulesPath + "/virtualisation/ec2-data.nix")
     (modulesPath + "/virtualisation/amazon-init.nix")
-    "${agenix}/modules/age.nix"
     ../modules/clawdinator.nix
     ./clawdinator-1-common.nix
   ];

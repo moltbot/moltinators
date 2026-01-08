@@ -90,5 +90,15 @@
           ./nix/hosts/clawdinator-1.nix
         ];
       };
+
+      nixosConfigurations.clawdinator-1-image = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit secrets; };
+        modules = [
+          ({ ... }: { nixpkgs.overlays = [ self.overlays.default ]; })
+          agenix.nixosModules.default
+          ./nix/hosts/clawdinator-1-image.nix
+        ];
+      };
     };
 }
