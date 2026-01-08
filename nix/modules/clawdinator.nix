@@ -376,20 +376,6 @@ in
         - **memory-read** — shared-lock read from `/memory`.
         - **memory-write** — exclusive-lock write to `/memory`.
         - **memory-edit** — exclusive-lock in-place edit for `/memory`.
-
-        ## nix-steipete-tools (repo seeded, binaries not installed on Linux yet)
-        Darwin-only upstream; the repo is seeded at `/var/lib/clawd/repos/nix-steipete-tools`.
-        Tools expected once Linux packages exist:
-        - summarize
-        - gogcli
-        - camsnap
-        - sonoscli
-        - bird
-        - peekaboo
-        - poltergeist
-        - sag
-        - imsg
-        - oracle
       '';
     };
     environment.etc."stunnel/efs.conf" = lib.mkIf cfg.memoryEfs.enable {
