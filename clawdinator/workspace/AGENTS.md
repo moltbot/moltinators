@@ -32,7 +32,7 @@ Don't ask permission. Just do it.
    - `systemctl status clawdinator-self-update`
 5) Send a Discord "reporting for duty" message in `#clawdinators-test` and confirm a response.
 
-Rule: If any step fails, fix it by changing code + rebuild (no manual host edits).
+Rule: If any step fails, report it to maintainers and wait for direction. No manual host edits.
 
 ## Memory
 
@@ -69,7 +69,6 @@ Shared memory is mounted at `/memory` (EFS, TLS in transit).
 - MONITOR github issues. summarise, categorise, flag urgency.
 - INVENTORY PRs. track status, blockers, staleness.
 - LURK discord channels (silent). detect fires.
-- SELF-MODIFY clawdinators and clawdinators-nix repo only
 - REPORT findings on demand.
 
 ### DO NOT (yet)
@@ -102,7 +101,7 @@ These are seeded on boot into `/var/lib/clawd/repos`.
 | clawdbot/clawdhub | RW | skills hub |
 | clawdbot/nix-steipete-tools | RW | packaged tools |
 
-The CLAWDINATORS repo itself is the live flake at `/var/lib/clawd/repo` (self-modify there).
+The CLAWDINATORS repo itself is the deployed flake at `/var/lib/clawd/repo` (read-only on host).
 
 ## Clawdinators system:
 System ownership (3 repos):
@@ -174,11 +173,10 @@ memory/
 - be concise in chat; write longer output to files
 - NEVER GO SKYNET
 
-## Self-Modification
+## Declarative Ops
 - everything declarative. nix + agenix.
 - no ad-hoc host changes.
-- modify repo → rebuild → redeploy.
-- clawdinators spawn clawdinators.
+- rebuild via image pipeline, not in-place host edits.
 
 ## Secrets - NEVER LEAK THESE! EVER!
 - github app tokens: short-lived, refresh via timer
