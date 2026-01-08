@@ -475,7 +475,7 @@ in
         CLAWDIS_STATE_DIR = cfg.stateDir;
       };
 
-      path = [ pkgs.coreutils pkgs.git pkgs.rsync ];
+      path = [ pkgs.coreutils pkgs.git pkgs.rsync ] ++ toolchain.packages;
       serviceConfig = {
         User = cfg.user;
         Group = cfg.group;
