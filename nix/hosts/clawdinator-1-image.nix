@@ -21,8 +21,15 @@
   networking.useDHCP = true;
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "prohibit-password";
+  assertions = [
+    {
+      assertion = (builtins.getEnv "CLAWDINATOR_AGE_KEY") != "";
+      message = "CLAWDINATOR_AGE_KEY must be set when building the image.";
+    }
+  ];
+
   environment.etc."agenix/keys/clawdinator.agekey" = {
-    source = ../keys/clawdinator.agekey;
+    text = builtins.getEnv "CLAWDINATOR_AGE_KEY";
     mode = "0400";
   };
   users.users.root.openssh.authorizedKeys.keys = [

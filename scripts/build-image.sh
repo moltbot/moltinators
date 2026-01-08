@@ -9,6 +9,14 @@ if [ -e "${out_dir}" ]; then
   rm -rf "${out_dir}"
 fi
 
+if [ -f nix/keys/clawdinator.agekey ]; then
+  export CLAWDINATOR_AGE_KEY
+  CLAWDINATOR_AGE_KEY="$(cat nix/keys/clawdinator.agekey)"
+else
+  echo "Missing nix/keys/clawdinator.agekey" >&2
+  exit 1
+fi
+
 nix run --impure github:nix-community/nixos-generators -- --flake "${flake_ref}" -f "${format}" -o "${out_dir}"
 
 out_real="${out_dir}"
