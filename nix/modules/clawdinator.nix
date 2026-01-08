@@ -155,6 +155,25 @@ in
       description = "Shared hive-mind memory directory.";
     };
 
+    memoryEfs = {
+      enable = mkEnableOption "EFS-backed shared memory mount";
+      fileSystemId = mkOption {
+        type = types.str;
+        default = "";
+        description = "EFS file system ID (fs-...).";
+      };
+      region = mkOption {
+        type = types.str;
+        default = "eu-central-1";
+        description = "AWS region for the EFS DNS name.";
+      };
+      mountPoint = mkOption {
+        type = types.str;
+        default = "/memory";
+        description = "Mount point for EFS shared memory.";
+      };
+    };
+
     repoSeedBaseDir = mkOption {
       type = types.str;
       default = "/var/lib/clawd/repos";
@@ -311,6 +330,10 @@ in
         assertion = (!cfg.githubApp.enable) || (cfg.githubApp.appId != "" && cfg.githubApp.installationId != "");
         message = "services.clawdinator.githubApp requires appId and installationId.";
       }
+      {
+        assertion = (!cfg.memoryEfs.enable) || (cfg.memoryEfs.fileSystemId != "");
+        message = "services.clawdinator.memoryEfs requires fileSystemId.";
+      }
     ];
 
     users.groups.${cfg.group} = {};
@@ -321,9 +344,39 @@ in
       createHome = true;
     };
 
-    environment.systemPackages = [ cfg.package ];
+    environment.systemPackages =
+      [ cfg.package ]
+      ++ lib.optional cfg.memoryEfs.enable pkgs.nfs-utils
+      ++ lib.optional cfg.memoryEfs.enable pkgs.stunnel
+      ++ [ pkgs.util-linux ];
 
     environment.etc."clawd/clawdbot.json".source = configSource;
+    environment.etc."clawdinator/bin/memory-read" = {
+      source = ../../scripts/memory-read.sh;
+      mode = "0755";
+    };
+    environment.etc."clawdinator/bin/memory-write" = {
+      source = ../../scripts/memory-write.sh;
+      mode = "0755";
+    };
+    environment.etc."clawdinator/bin/memory-edit" = {
+      source = ../../scripts/memory-edit.sh;
+      mode = "0755";
+    };
+    environment.etc."stunnel/efs.conf" = lib.mkIf cfg.memoryEfs.enable {
+      mode = "0644";
+      text = ''
+        foreground = yes
+        pid = /run/stunnel-efs.pid
+        client = yes
+
+        [efs]
+        accept = 127.0.0.1:2049
+        connect = ${cfg.memoryEfs.fileSystemId}.efs.${cfg.memoryEfs.region}.amazonaws.com:2049
+        verifyChain = yes
+        CAfile = ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+      '';
+    };
 
     systemd.tmpfiles.rules = [
       "d ${cfg.stateDir} 0750 ${cfg.user} ${cfg.group} - -"
@@ -331,7 +384,29 @@ in
       "d ${logDir} 0750 ${cfg.user} ${cfg.group} - -"
       "d ${cfg.memoryDir} 0750 ${cfg.user} ${cfg.group} - -"
       "d ${repoSeedBaseDir} 0750 ${cfg.user} ${cfg.group} - -"
+      "d /usr/local/bin 0755 root root - -"
+      "L+ /usr/local/bin/memory-read - - - - /etc/clawdinator/bin/memory-read"
+      "L+ /usr/local/bin/memory-write - - - - /etc/clawdinator/bin/memory-write"
+      "L+ /usr/local/bin/memory-edit - - - - /etc/clawdinator/bin/memory-edit"
     ];
+
+    fileSystems = lib.mkIf cfg.memoryEfs.enable {
+      "${cfg.memoryEfs.mountPoint}" = {
+        device = "127.0.0.1:/";
+        fsType = "nfs4";
+        options = [
+          "nfsvers=4.1"
+          "rsize=1048576"
+          "wsize=1048576"
+          "hard"
+          "timeo=600"
+          "retrans=2"
+          "noresvport"
+          "x-systemd.requires=clawdinator-efs-stunnel.service"
+          "x-systemd.after=clawdinator-efs-stunnel.service"
+        ];
+      };
+    };
 
     systemd.services.clawdinator = {
       description = "CLAWDINATOR (Clawdbot gateway)";
@@ -367,6 +442,28 @@ in
         RestartSec = 2;
         StandardOutput = "append:${logDir}/gateway.log";
         StandardError = "append:${logDir}/gateway.log";
+      };
+    };
+
+    systemd.services.clawdinator-efs-stunnel = lib.mkIf cfg.memoryEfs.enable {
+      description = "CLAWDINATOR EFS TLS tunnel";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.stunnel}/bin/stunnel /etc/stunnel/efs.conf";
+        Restart = "always";
+      };
+    };
+
+    systemd.services.clawdinator-memory-init = lib.mkIf cfg.memoryEfs.enable {
+      description = "CLAWDINATOR memory directory init";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "remote-fs.target" ];
+      wants = [ "remote-fs.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${../../scripts/init-memory.sh} ${cfg.memoryEfs.mountPoint}";
       };
     };
 

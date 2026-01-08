@@ -1,6 +1,7 @@
 # OpenTofu (AWS S3 Image Bucket)
 
 Goal: use the CLAWDINATOR S3 bucket for images, plus create the VM Import role and attach import permissions to the CI IAM user.
+Also provisions EFS for shared memory.
 
 Prereqs:
 - AWS credentials with permissions to manage IAM (use your homelab-admin key locally).
@@ -24,6 +25,8 @@ Outputs:
 - `instance_id`
 - `instance_public_ip`
 - `instance_public_dns`
+- `efs_file_system_id`
+- `efs_security_group_id`
 
 CI wiring:
 - Set GitHub Actions secrets:

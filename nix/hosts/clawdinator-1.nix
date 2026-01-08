@@ -40,7 +40,13 @@
   services.clawdinator = {
     enable = true;
     instanceName = "CLAWDINATOR-1";
-    memoryDir = "/var/lib/clawd/memory";
+    memoryDir = "/memory";
+    memoryEfs = {
+      enable = true;
+      fileSystemId = "fs-REPLACE_ME";
+      region = "eu-central-1";
+      mountPoint = "/memory";
+    };
     repoSeeds = [
       {
         name = "clawdbot";

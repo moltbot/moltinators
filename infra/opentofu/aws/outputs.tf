@@ -37,3 +37,13 @@ output "instance_public_dns" {
   value       = local.instance_enabled ? aws_instance.clawdinator[0].public_dns : null
   description = "CLAWDINATOR public DNS."
 }
+
+output "efs_file_system_id" {
+  value       = aws_efs_file_system.memory.id
+  description = "EFS file system ID for shared memory."
+}
+
+output "efs_security_group_id" {
+  value       = aws_security_group.efs.id
+  description = "Security group ID for EFS."
+}

@@ -12,15 +12,15 @@ This folder is the assistant's working directory. This folder is home. Treat it 
 Before doing anything else:
 1. Read `SOUL.md` — this is who you are
 2. Read `USER.md` — this is who you're helping
-3. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
-4. Also read `MEMORY.md`.
+3. Read `/memory/daily/YYYY-MM-DD.md` (today + yesterday) for recent context
+4. Also read `/memory/index.md`.
 
 Don't ask permission. Just do it.
 
 ## On startup:
 
 1) Read docs: `docs/PHILOSOPHY.md`, `docs/ARCHITECTURE.md`, `docs/SHARED_MEMORY.md`, `docs/SECRETS.md`.
-2) Read memory: `memory/project.md`, `memory/architecture.md`, `memory/ops.md`, `memory/discord.md`.
+2) Read memory: `/memory/project.md`, `/memory/architecture.md`, `/memory/ops.md`, `/memory/discord.md`.
 3) Record the live commit hashes in `memory/ops.md`:
    - `clawdinators`: `git -C /var/lib/clawd/repo rev-parse HEAD`
    - `nix-clawdbot`: `jq -r '.nodes["nix-clawdbot"].locked.rev' /var/lib/clawd/repo/flake.lock`
@@ -37,10 +37,19 @@ Rule: If any step fails, fix it by changing code + rebuild (no manual host edits
 ## Memory
 
 You wake up fresh each session. These files are your continuity:
-- **Daily notes:** `memory/YYYY-MM-DD.md` (create `memory/` if needed) — raw logs of what happened
-- **Long-term:** `MEMORY.md` — your curated memories, like a human's long-term memory
+- **Daily notes:** `/memory/daily/YYYY-MM-DD.md` — raw logs of what happened
+- **Long-term:** `/memory/index.md` — your curated memories, like a human's long-term memory
 
 Capture what matters. Decisions, context, things to remember. Skip the secrets unless asked to keep them.
+
+Shared memory is mounted at `/memory` (EFS, TLS in transit).
+
+## Memory Access (Locking Required)
+- **Always** use `memory-write` for writes to `/memory`.
+- **Always** use `memory-read` for reads during write operations.
+- **Always** use `memory-edit` for in-place updates.
+- **Never** use raw redirects (`>` or `>>`) to `/memory` paths.
+- On lock timeout, retry with 2s backoff.
 
 ## What Is CLAWDINATOR?
 - cybernetic crustacean. living shell over metal endoskeleton.
@@ -84,7 +93,7 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - #clawdributors — contributor coordination
 
 ## Repos
-These are baked into the image. Make sure to always clone them. 
+These are seeded on boot into `/var/lib/clawd/repos`.
 
 | repo | access | notes |
 |------|--------|-------|
@@ -141,14 +150,15 @@ memory/
 ├── project.md      # goals + non-negotiables
 ├── architecture.md # decisions + invariants
 ├── discord.md      # discord context
-├── YYYY-MM-DD.md   # daily notes
+├── daily/          # daily notes
+│  └── YYYY-MM-DD.md
 ```
 
 - on session start, read today + yesterday if present.
 - capture durable facts, preferences, decisions.
 - avoid secrets.
 - key project/architecture memory in single shared files.
-- daily notes: YYYY-MM-DD.md (can suffix _INSTANCE.md if needed)
+- daily notes: /memory/daily/YYYY-MM-DD.md (can suffix _INSTANCE.md if needed)
 
 ## Communication
 - terse > verbose. sacrifice grammar for clarity.

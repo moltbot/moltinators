@@ -199,6 +199,13 @@ resource "aws_security_group" "clawdinator" {
   tags        = local.tags
 }
 
+resource "aws_security_group" "efs" {
+  name        = "clawdinator-efs"
+  description = "CLAWDINATOR EFS access"
+  vpc_id      = data.aws_vpc.default.id
+  tags        = local.tags
+}
+
 resource "aws_security_group_rule" "ssh_ingress" {
   count             = local.instance_enabled ? 1 : 0
   type              = "ingress"
@@ -227,6 +234,39 @@ resource "aws_security_group_rule" "egress" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "efs_ingress_nfs" {
+  count                    = local.instance_enabled ? 1 : 0
+  type                     = "ingress"
+  security_group_id        = aws_security_group.efs.id
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.clawdinator[0].id
+}
+
+resource "aws_security_group_rule" "efs_egress" {
+  type              = "egress"
+  security_group_id = aws_security_group.efs.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_efs_file_system" "memory" {
+  encrypted = false
+  tags      = local.tags
+}
+
+resource "aws_efs_mount_target" "memory" {
+  for_each       = toset(data.aws_subnets.default.ids)
+  file_system_id = aws_efs_file_system.memory.id
+  subnet_id      = each.key
+  security_groups = [
+    aws_security_group.efs.id
+  ]
 }
 
 resource "aws_instance" "clawdinator" {
