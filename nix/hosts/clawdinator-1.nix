@@ -57,6 +57,10 @@
         url = "https://github.com/clawdbot/nix-clawdbot.git";
       }
       {
+        name = "clawdinators";
+        url = "https://github.com/clawdbot/clawdinators.git";
+      }
+      {
         name = "clawdhub";
         url = "https://github.com/clawdbot/clawdhub.git";
       }

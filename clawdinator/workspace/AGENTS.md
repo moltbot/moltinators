@@ -98,6 +98,7 @@ These are seeded on boot into `/var/lib/clawd/repos`.
 |------|--------|-------|
 | clawdbot/clawdbot | RO | the bot itself |
 | clawdbot/nix-clawdbot | RW | packaging for clawdinators |
+| clawdbot/clawdinators | RO | infra source (do not edit on host) |
 | clawdbot/clawdhub | RW | skills hub |
 | clawdbot/nix-steipete-tools | RW | packaged tools |
 
