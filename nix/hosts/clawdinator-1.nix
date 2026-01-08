@@ -43,7 +43,7 @@
     memoryDir = "/memory";
     memoryEfs = {
       enable = true;
-      fileSystemId = "fs-REPLACE_ME";
+      fileSystemId = "fs-0e7920726c2965a88";
       region = "eu-central-1";
       mountPoint = "/memory";
     };
