@@ -66,7 +66,8 @@
               install -Dm755 "$NODE_GYP_WRAPPER_SH" "$wrapper_dir/node-gyp"
               export PATH="$wrapper_dir:$PATH"
             '';
-            postInstall = (old.postInstall or "") + ''
+            installPhase = ''
+              ${old.installPhase}
               pi_dir="$(find "$out/lib/clawdbot/node_modules/.pnpm" -maxdepth 1 -type d -name "@mariozechner+pi-coding-agent@*" | head -n1)"
               if [ -z "$pi_dir" ]; then
                 echo "pi-coding-agent directory not found for strip-ansi link" >&2
