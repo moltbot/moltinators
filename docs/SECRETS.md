@@ -37,7 +37,7 @@ Agenix (local secrets repo):
 - Decrypt on host with agenix; point NixOS options at `/run/agenix/*`.
 - Image builds bake the agenix identity to `/etc/agenix/keys/clawdinator.agekey`; do not commit this key.
 - Required files (minimum): `clawdinator-github-app.pem.age`, `clawdinator-discord-token.age`, `clawdinator-anthropic-api-key.age`.
-- Also required for OpenAI: `clawdinator-openai-api-key.age`.
+- Also required for OpenAI: `clawdinator-openai-api-key-peter-2.age`.
 - CI image pipeline (stored locally, not on hosts): `clawdinator-image-uploader-access-key-id.age`, `clawdinator-image-uploader-secret-access-key.age`, `clawdinator-image-bucket-name.age`, `clawdinator-image-bucket-region.age`.
 
 Example NixOS wiring (agenix):
@@ -50,8 +50,8 @@ Example NixOS wiring (agenix):
     "/var/lib/clawd/nix-secrets/clawdinator-github-app.pem.age";
   age.secrets."clawdinator-anthropic-api-key".file =
     "/var/lib/clawd/nix-secrets/clawdinator-anthropic-api-key.age";
-  age.secrets."clawdinator-openai-api-key".file =
-    "/var/lib/clawd/nix-secrets/clawdinator-openai-api-key.age";
+  age.secrets."clawdinator-openai-api-key-peter-2".file =
+    "/var/lib/clawd/nix-secrets/clawdinator-openai-api-key-peter-2.age";
   age.secrets."clawdinator-discord-token".file =
     "/var/lib/clawd/nix-secrets/clawdinator-discord-token.age";
 
@@ -60,7 +60,7 @@ Example NixOS wiring (agenix):
   services.clawdinator.anthropicApiKeyFile =
     "/run/agenix/clawdinator-anthropic-api-key";
   services.clawdinator.openaiApiKeyFile =
-    "/run/agenix/clawdinator-openai-api-key";
+    "/run/agenix/clawdinator-openai-api-key-peter-2";
   services.clawdinator.discordTokenFile =
     "/run/agenix/clawdinator-discord-token";
 }

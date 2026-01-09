@@ -66,7 +66,7 @@ jobs:
             nix/age-secrets/clawdinator-github-app.pem.age \
             nix/age-secrets/clawdinator-discord-token.age \
             nix/age-secrets/clawdinator-anthropic-api-key.age \
-            nix/age-secrets/clawdinator-openai-api-key.age
+            nix/age-secrets/clawdinator-openai-api-key-peter-2.age
           do
             test -f "$file"
           done

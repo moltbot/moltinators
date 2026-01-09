@@ -37,8 +37,8 @@ in
       owner = "clawdinator";
       group = "clawdinator";
     };
-    age.secrets."clawdinator-openai-api-key" = {
-      file = "${secretsPath}/clawdinator-openai-api-key.age";
+    age.secrets."clawdinator-openai-api-key-peter-2" = {
+      file = "${secretsPath}/clawdinator-openai-api-key-peter-2.age";
       owner = "clawdinator";
       group = "clawdinator";
     };
@@ -127,7 +127,7 @@ in
       };
 
       anthropicApiKeyFile = "/run/agenix/clawdinator-anthropic-api-key";
-      openaiApiKeyFile = "/run/agenix/clawdinator-openai-api-key";
+      openaiApiKeyFile = "/run/agenix/clawdinator-openai-api-key-peter-2";
       discordTokenFile = "/run/agenix/clawdinator-discord-token";
 
       githubApp = {
