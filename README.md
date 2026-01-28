@@ -311,28 +311,41 @@ The `clawdinator` module exposes these options:
     # Identity
     instanceName = "clawdinator-1";
 
-    # Providers
-    discord = {
-      botTokenFile = "/run/agenix/discord-bot-token";
-      guildId = "...";
-      channelIds = [ "..." ];
+    # Raw Moltbot config
+    config = {
+      channels.discord = {
+        enabled = true;
+        dm.enabled = false;
+        guilds = {
+          "<GUILD_ID>" = {
+            requireMention = true;
+            channels = {
+              "<CHANNEL_ID>" = { allow = true; requireMention = true; };
+            };
+          };
+        };
+      };
     };
 
-    anthropic.apiKeyFile = "/run/agenix/anthropic-api-key";
-    openai.apiKeyFile = "/run/agenix/openai-api-key";
+    # Providers
+    discordTokenFile = "/run/agenix/discord-bot-token";
+    anthropicApiKeyFile = "/run/agenix/anthropic-api-key";
+    openaiApiKeyFile = "/run/agenix/openai-api-key";
 
     # GitHub App
-    github = {
+    githubApp = {
+      enable = true;
       appId = "...";
       installationId = "...";
       privateKeyFile = "/run/agenix/github-app-key";
     };
 
     # Memory (EFS)
-    memory = {
+    memoryEfs = {
       enable = true;
       mountPoint = "/var/lib/clawd/memory";
-      efsId = "fs-...";
+      fileSystemId = "fs-...";
+      region = "eu-central-1";
     };
   };
 }

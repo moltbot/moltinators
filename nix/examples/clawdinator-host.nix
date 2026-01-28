@@ -40,14 +40,16 @@
         }
       ];
       skills.allowBundled = [ "github" "clawdhub" ];
-      discord = {
-        enabled = true;
-        dm.enabled = false;
-        guilds = {
-          "<GUILD_ID>" = {
-            requireMention = true;
-            channels = {
-              "<CHANNEL_NAME>" = { allow = true; requireMention = true; };
+      channels = {
+        discord = {
+          enabled = true;
+          dm.enabled = false;
+          guilds = {
+            "<GUILD_ID>" = {
+              requireMention = true;
+              channels = {
+                "<CHANNEL_NAME>" = { allow = true; requireMention = true; };
+              };
             };
           };
         };

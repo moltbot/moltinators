@@ -125,28 +125,30 @@ in
           enabled = true;
           store = "/var/lib/clawd/cron-jobs.json";
         };
-        discord = {
-          enabled = true;
-          dm.enabled = false;
-          guilds = {
-            "1456350064065904867" = {
-              requireMention = false;
-              channels = {
-                # #clawdinators-test
-                "1458426982579830908" = {
-                  allow = true;
-                  requireMention = false;
-                  autoReply = true;
-                };
-                # #clawdributors-test (lurk only; replies denied via sendPolicy)
-                "1458138963067011176" = {
-                  allow = true;
-                  requireMention = false;
-                };
-                # #clawdributors (lurk only; replies denied via sendPolicy)
-                "1458141495701012561" = {
-                  allow = true;
-                  requireMention = false;
+        channels = {
+          discord = {
+            enabled = true;
+            dm.enabled = false;
+            guilds = {
+              "1456350064065904867" = {
+                requireMention = false;
+                channels = {
+                  # #clawdinators-test
+                  "1458426982579830908" = {
+                    allow = true;
+                    requireMention = false;
+                    autoReply = true;
+                  };
+                  # #clawdributors-test (lurk only; replies denied via sendPolicy)
+                  "1458138963067011176" = {
+                    allow = true;
+                    requireMention = false;
+                  };
+                  # #clawdributors (lurk only; replies denied via sendPolicy)
+                  "1458141495701012561" = {
+                    allow = true;
+                    requireMention = false;
+                  };
                 };
               };
             };
