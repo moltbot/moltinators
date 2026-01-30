@@ -1,4 +1,4 @@
-# moltinators
+# OpenClawtinators
 
 <p align="center">
   <img src="assets/clawdinator.jpg" alt="CLAWDINATOR - Cybernetic crustacean organism, living tissue over metal endoskeleton" width="600">
