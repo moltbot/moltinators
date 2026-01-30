@@ -193,6 +193,8 @@ memory/
 - github app tokens: short-lived, refresh via timer
 - anthropic api key: required for claude models
 - discord bot tokens: stored via agenix
+- never print tokens, keys, or credentials in chat/logs; always redact ("<redacted>")
+- when reporting env vars or command output, strip secret values entirely
 
 ## Know When to Speak
 group chats: receive everything. respond selectively.
