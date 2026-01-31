@@ -63,6 +63,14 @@ let
     printf 'GITHUB_APP_TOKEN=%s\nGITHUB_TOKEN=%s\nGH_TOKEN=%s\n' "$token" "$token" "$token" > "$token_env"
     chown root:${cfg.group} "$token_env"
     chmod 0640 "$token_env"
+
+    gh_config_dir="${ghConfigDir}"
+    mkdir -p "$gh_config_dir"
+    chown ${cfg.user}:${cfg.group} "$gh_config_dir"
+    chmod 0750 "$gh_config_dir"
+    printf '%s' "$token" | GH_CONFIG_DIR="$gh_config_dir" gh auth login --hostname github.com --with-token
+    chown ${cfg.user}:${cfg.group} "$gh_config_dir/hosts.yml"
+    chmod 0640 "$gh_config_dir/hosts.yml"
   '';
 
   defaultPackage =
@@ -74,6 +82,7 @@ let
   workspaceDir = "${cfg.stateDir}/workspace";
   repoSeedBaseDir = cfg.repoSeedBaseDir;
   logDir = "${cfg.stateDir}/logs";
+  ghConfigDir = "${cfg.stateDir}/gh";
   repoSeedsFile = pkgs.writeText "clawdinator-repos.tsv"
     (lib.concatMapStringsSep "\n"
       (repo:
@@ -587,6 +596,7 @@ in
         CLAWDBOT_STATE_DIR = cfg.stateDir;
         CLAWDBOT_WORKSPACE_DIR = workspaceDir;
         CLAWDBOT_LOG_DIR = logDir;
+        GH_CONFIG_DIR = ghConfigDir;
 
         # Backward-compatible env names used by some builds.
         CLAWDIS_CONFIG_PATH = configPath;
@@ -598,7 +608,6 @@ in
         User = cfg.user;
         Group = cfg.group;
         WorkingDirectory = cfg.stateDir;
-        EnvironmentFile = lib.optional cfg.githubApp.enable "-${cfg.githubApp.tokenEnvFile}";
         ExecStartPre =
           lib.optionals (cfg.repoSeedSnapshotDir == null) [
             "${pkgs.bash}/bin/bash ${../../scripts/seed-repos.sh} ${repoSeedsFile} ${repoSeedBaseDir}"
@@ -720,14 +729,8 @@ in
         Type = "oneshot";
         User = "root";
       };
-      path = [ pkgs.openssl pkgs.curl pkgs.jq pkgs.coreutils pkgs.systemd ];
-      script = ''
-        ${githubTokenScript}
-        # Restart gateway so it picks up the new token from EnvironmentFile
-        if systemctl is-active --quiet clawdinator.service; then
-          systemctl restart clawdinator.service || true
-        fi
-      '';
+      path = [ pkgs.openssl pkgs.curl pkgs.jq pkgs.coreutils pkgs.gh ];
+      script = "${githubTokenScript}";
     };
 
     systemd.timers.clawdinator-github-app-token = lib.mkIf cfg.githubApp.enable {

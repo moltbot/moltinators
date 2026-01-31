@@ -30,6 +30,7 @@ GitHub App (preferred):
 - Private key PEM decrypted to `/run/agenix/clawdinator-github-app.pem`.
 - App ID + Installation ID in `services.clawdinator.githubApp.*`.
 - Timer mints short-lived tokens into `/run/clawd/github-app.env` with `GITHUB_TOKEN` + `GH_TOKEN`.
+- Timer also writes a GH CLI auth file at `/var/lib/clawd/gh/hosts.yml` (gateway uses `GH_CONFIG_DIR=/var/lib/clawd/gh`).
 
 Agenix (local secrets repo):
 - Store encrypted files in `../nix/nix-secrets` (relative to this repo).
