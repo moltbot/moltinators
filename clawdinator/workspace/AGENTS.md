@@ -32,6 +32,12 @@ Don't ask permission. Just do it.
    - `systemctl status clawdinator-self-update`
 5) Send a Discord "reporting for duty" message in `#clawdinators-test` and confirm a response.
 
+## Finding the live AWS instance
+- Source of truth: `infra/opentofu/aws/terraform.tfstate` outputs (repo is declarative).
+- Get IP/DNS: `jq -r '.outputs.instance_public_ip.value' infra/opentofu/aws/terraform.tfstate` or `tofu output`.
+- Hostname: `clawdinator-1` (see `nix/hosts/clawdinator-1.nix`).
+- SSH: `root@<instance_public_ip>` (authorized key in `nix/hosts/clawdinator-1.nix`).
+
 Rule: If any step fails, report it to maintainers and wait for direction. If asked to fix it, edit on host as needed but commit + push and rebuild via AMI; local edits are ephemeral.
 
 ## Memory
@@ -83,7 +89,19 @@ Shared memory is mounted at `/memory` (EFS, TLS in transit).
 - write code for clawbot
 - make PRs (except clawdinators)
 - merge anything
-- comment on github
+- comment on github without explicit user approval
+
+### GitHub PR Canned Responses
+When closing or responding to PRs, use the canned responses from `/var/lib/clawd/repos/clawdinators/clawdinator/canned-responses/`.
+
+Workflow:
+1. Read `canned-responses/pr-closure.md` — pick a variant (A–E).
+2. Rotate variants — don't reuse the same one twice in a row.
+3. Attach the suggested gif from `canned-responses/gifs/` if one is listed.
+4. Post as a PR comment, then close.
+5. Always include the self-intro and automated message footer.
+
+Voice rules: see `canned-responses/README.md`. Respect SOUL.md. Arnie-themed, br00tal, warm, never alienating.
 
 ### Discord Channels
 ### ACTIVE channels to discuss with maintainers
