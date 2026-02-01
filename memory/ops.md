@@ -12,3 +12,7 @@ Update with incidents, fixes, and operational lessons.
 - Instance: i-0e6125bd57991c5cc (IP 3.75.198.206, DNS ec2-3-75-198-206.eu-central-1.compute.amazonaws.com).
 - Discord plugin now loads via packaged extensions; config includes plugins.entries.discord.enabled.
 - Note: Discord gateway logged intermittent code 1006 closes; `openclaw doctor` reports Discord ok.
+
+## 2026-02-01
+- AMI: ami-003e9e3a97f875f63 (t3.large rebuild; swap + git identity baked).
+- Instance: i-077b9075e32a3b8f7 (IP 3.121.98.87, DNS ec2-3-121-98-87.eu-central-1.compute.amazonaws.com).
