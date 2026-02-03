@@ -20,3 +20,9 @@ Update with incidents, fixes, and operational lessons.
 ## 2026-02-02
 - AMI: ami-047e0e6354df0f87e (pi coding agent + OpenAI API defaults).
 - Instance: i-0d1b0e288dd70273b (IP 3.73.1.102, DNS ec2-3-73-1-102.eu-central-1.compute.amazonaws.com).
+
+## 2026-02-03
+- AMI: ami-027054fbbee8d71cc (multi-instance fleet).
+- Instances:
+  - clawdinator-1: i-0b6060699bb413d82 (IP 18.198.25.107, DNS ec2-18-198-25-107.eu-central-1.compute.amazonaws.com).
+  - clawdinator-2: i-09a227ae1daa5d108 (IP 3.74.41.147, DNS ec2-3-74-41-147.eu-central-1.compute.amazonaws.com).
