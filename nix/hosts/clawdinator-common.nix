@@ -180,10 +180,10 @@ in
               "1456350064065904867" = {
                 requireMention = false;
                 channels = {
-                  # #clawdinators-test
+                  # #clawdinators-test (mention-only)
                   "1458426982579830908" = {
                     allow = true;
-                    requireMention = false;
+                    requireMention = true;
                     users = [ "*" ];
                   };
                   # #clawdributors-test (lurk only; replies denied via sendPolicy)
