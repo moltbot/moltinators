@@ -191,6 +191,18 @@ data "aws_iam_policy_document" "instance_bootstrap" {
       "s3:GetObjectAttributes"
     ]
     resources = [
+      "${aws_s3_bucket.image_bucket.arn}/bootstrap/*",
+      "${aws_s3_bucket.image_bucket.arn}/age-secrets/*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:AbortMultipartUpload",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [
       "${aws_s3_bucket.image_bucket.arn}/bootstrap/*"
     ]
   }
@@ -204,7 +216,7 @@ data "aws_iam_policy_document" "instance_bootstrap" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["bootstrap/*"]
+      values   = ["bootstrap/*", "age-secrets/*"]
     }
   }
 }
