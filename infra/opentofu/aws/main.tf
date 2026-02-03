@@ -151,6 +151,18 @@ data "aws_iam_policy_document" "ami_importer" {
   }
 
   statement {
+    sid = "TerraformLockTable"
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:UpdateItem"
+    ]
+    resources = [aws_dynamodb_table.terraform_lock.arn]
+  }
+
+  statement {
     sid = "PassVmImportRole"
     actions = ["iam:PassRole"]
     resources = [aws_iam_role.vmimport.arn]
