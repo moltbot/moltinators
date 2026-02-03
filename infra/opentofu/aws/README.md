@@ -54,6 +54,8 @@ export TF_VAR_github_token=...
 - `efs_file_system_id`
 - `efs_security_group_id`
 - `control_api_url`
+- `control_invoker_access_key_id`
+- `control_invoker_secret_access_key`
 
 ## CI wiring
 - Set GitHub Actions secrets:
@@ -64,6 +66,8 @@ export TF_VAR_github_token=...
   - `CLAWDINATOR_SSH_PUBLIC_KEY`
   - `CONTROL_API_TOKEN`
   - `CLAWDINATOR_WORKFLOW_TOKEN`
+  - `CLAWDINATOR_CONTROL_AWS_ACCESS_KEY_ID`
+  - `CLAWDINATOR_CONTROL_AWS_SECRET_ACCESS_KEY`
 
 ## Runtime bootstrap
 - Instances get an IAM role with read access to `s3://${S3_BUCKET}/bootstrap/*` for secrets + repo seeds.

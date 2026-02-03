@@ -26,7 +26,7 @@ Goal: manage CLAWDINATOR host lifecycle (create/recreate/replace) from **CLAWDIN
   - Dispatches GitHub Actions workflows.
   - Handles `/fleet status` via AWS DescribeInstances.
 - **Fleet Control Skill** (runs inside CLAWDINATOR)
-  - Calls the Control API via `scripts/fleet-control.sh`.
+  - Calls the Control API via `scripts/fleet-control.sh` (AWS IAM invoke).
   - Enforces policy (no self‑deploy) before calling.
 - **GitHub Actions** (execution)
   - Runs OpenTofu apply.
@@ -40,7 +40,9 @@ Goal: manage CLAWDINATOR host lifecycle (create/recreate/replace) from **CLAWDIN
 
 ## Control API Auth
 - Shared control token stored as `clawdinator-control-token.age`.
-- Token is sent via `X-Clawdinator-Token` header to avoid Lambda URL auth conflicts.
+- Control API is invoked via AWS IAM using a **minimal invoker key**:
+  - `clawdinator-control-aws-access-key-id.age`
+  - `clawdinator-control-aws-secret-access-key.age`
 - Token is injected into instances via bootstrap and read from `/run/agenix/clawdinator-control-token`.
 
 ## Control API Env (Lambda)
@@ -139,7 +141,10 @@ Example:
 ## Plane Ops Runbook (Chat‑only)
 ### Preflight (before flight)
 1) Control API Lambda exists; URL is written to `/etc/clawdinator/control-api-url`.
-2) `clawdinator-control-token.age` exists in `nix-secrets` and is in bootstrap bundles.
+2) Control secrets exist in `nix-secrets` and are in bootstrap bundles:
+   - `clawdinator-control-token.age`
+   - `clawdinator-control-aws-access-key-id.age`
+   - `clawdinator-control-aws-secret-access-key.age`
 3) GitHub Action `fleet-deploy.yml` exists and can be dispatched.
 4) `nix/instances.json` includes all desired instances.
 5) Discord tokens are encrypted in `nix-secrets` and synced to S3 `age-secrets/`.
@@ -158,8 +163,12 @@ Example:
 3) Update OpenTofu:
    - multi‑instance `for_each` using `nix/instances.json`.
    - S3 backend + Dynamo lock table.
-   - Control API Lambda (Function URL).
-4) Add `clawdinator-control-token.age` to `nix-secrets` and include in bootstrap bundles.
+   - Control API Lambda.
+   - Control invoker IAM user (lambda invoke only).
+4) Add control secrets to `nix-secrets` and include in bootstrap bundles:
+   - `clawdinator-control-token.age`
+   - `clawdinator-control-aws-access-key-id.age`
+   - `clawdinator-control-aws-secret-access-key.age`
 5) Add workflow `fleet-deploy.yml`:
    - inputs: `target`, `ami_override` (optional).
    - resolves latest AMI by tag when override not set.

@@ -16,6 +16,7 @@ Control plane (OOB):
 
 Runtime control (CLAWDINATOR):
 - `clawdinator-control-token.age` is injected to `/run/agenix/clawdinator-control-token` and used by `/fleet`.
+- `clawdinator-control-aws-access-key-id.age` + `clawdinator-control-aws-secret-access-key.age` allow Lambda invocation.
 - Token is shared across instances (KISS); policy enforcement happens in the skill.
 
 Local storage:
@@ -52,7 +53,7 @@ Agenix (local secrets repo):
 - Sync encrypted secrets to the host at `/var/lib/clawd/nix-secrets`.
 - Decrypt on host with agenix; point NixOS options at `/run/agenix/*`.
 - Image builds do **not** bake the agenix identity; the age key is injected at runtime via the bootstrap bundle.
-- Required files (minimum): `clawdinator-github-app.pem.age`, `clawdinator-anthropic-api-key.age`, `clawdinator-openai-api-key-peter-2.age`, `clawdinator-control-token.age`.
+- Required files (minimum): `clawdinator-github-app.pem.age`, `clawdinator-anthropic-api-key.age`, `clawdinator-openai-api-key-peter-2.age`, `clawdinator-control-token.age`, `clawdinator-control-aws-access-key-id.age`, `clawdinator-control-aws-secret-access-key.age`.
 - Required per instance: `clawdinator-discord-token-1.age`, `clawdinator-discord-token-2.age` (one per instance).
 - Required for Telegram: `clawdinator-telegram-bot-token.age` (when Telegram is enabled).
 - Telegram allowlist (if using allowFrom secrets): `clawdinator-telegram-allow-from.age`.
@@ -81,6 +82,10 @@ Example NixOS wiring (agenix):
     "/var/lib/clawd/nix-secrets/clawdinator-discord-token-1.age";
   age.secrets."clawdinator-control-token".file =
     "/var/lib/clawd/nix-secrets/clawdinator-control-token.age";
+  age.secrets."clawdinator-control-aws-access-key-id".file =
+    "/var/lib/clawd/nix-secrets/clawdinator-control-aws-access-key-id.age";
+  age.secrets."clawdinator-control-aws-secret-access-key".file =
+    "/var/lib/clawd/nix-secrets/clawdinator-control-aws-secret-access-key.age";
   age.secrets."clawdinator-telegram-bot-token".file =
     "/var/lib/clawd/nix-secrets/clawdinator-telegram-bot-token.age";
   age.secrets."clawdinator-telegram-allow-from".file =

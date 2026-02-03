@@ -10,6 +10,10 @@
     "/var/lib/clawd/nix-secrets/clawdinator-discord-token-1.age";
   age.secrets."clawdinator-control-token".file =
     "/var/lib/clawd/nix-secrets/clawdinator-control-token.age";
+  age.secrets."clawdinator-control-aws-access-key-id".file =
+    "/var/lib/clawd/nix-secrets/clawdinator-control-aws-access-key-id.age";
+  age.secrets."clawdinator-control-aws-secret-access-key".file =
+    "/var/lib/clawd/nix-secrets/clawdinator-control-aws-secret-access-key.age";
   age.secrets."clawdinator-telegram-bot-token".file =
     "/var/lib/clawd/nix-secrets/clawdinator-telegram-bot-token.age";
   age.secrets."clawdinator-telegram-allow-from".file =

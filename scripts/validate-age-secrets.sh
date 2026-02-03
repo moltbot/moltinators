@@ -9,6 +9,8 @@ required_common=(
   "clawdinator-anthropic-api-key.age"
   "clawdinator-openai-api-key-peter-2.age"
   "clawdinator-control-token.age"
+  "clawdinator-control-aws-access-key-id.age"
+  "clawdinator-control-aws-secret-access-key.age"
   "clawdinator-telegram-bot-token.age"
   "clawdinator-telegram-allow-from.age"
 )

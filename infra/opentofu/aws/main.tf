@@ -410,9 +410,36 @@ resource "aws_lambda_function_url" "control" {
 }
 
 resource "aws_lambda_permission" "control_url" {
-  count         = var.control_api_enabled ? 1 : 0
-  statement_id  = "AllowFunctionUrl"
-  action        = "lambda:InvokeFunctionUrl"
-  function_name = aws_lambda_function.control[0].function_name
-  principal     = "*"
+  count                   = var.control_api_enabled ? 1 : 0
+  statement_id            = "AllowFunctionUrl"
+  action                  = "lambda:InvokeFunctionUrl"
+  function_name           = aws_lambda_function.control[0].function_name
+  principal               = "*"
+  function_url_auth_type  = "NONE"
+}
+
+resource "aws_iam_user" "control_invoker" {
+  count = var.control_api_enabled ? 1 : 0
+  name  = var.control_invoker_user_name
+  tags  = local.tags
+}
+
+resource "aws_iam_access_key" "control_invoker" {
+  count = var.control_api_enabled ? 1 : 0
+  user  = aws_iam_user.control_invoker[0].name
+}
+
+data "aws_iam_policy_document" "control_invoker" {
+  count = var.control_api_enabled ? 1 : 0
+  statement {
+    actions = ["lambda:InvokeFunction"]
+    resources = [aws_lambda_function.control[0].arn]
+  }
+}
+
+resource "aws_iam_user_policy" "control_invoker" {
+  count  = var.control_api_enabled ? 1 : 0
+  name   = "clawdinator-control-invoke"
+  user   = aws_iam_user.control_invoker[0].name
+  policy = data.aws_iam_policy_document.control_invoker[0].json
 }

@@ -70,7 +70,7 @@ Deploy flow (automation-first):
 - Bootstrap AWS instances from the AMI with `infra/opentofu/aws` (set `TF_VAR_ami_id`).
 - Import the image into AWS as an AMI (snapshot import + register image).
 - Ensure secrets are encrypted to the baked agenix key (see `../nix/nix-secrets/secrets.nix`).
-- Ensure required secrets exist: `clawdinator-github-app.pem`, `clawdinator-discord-token-<n>`, `clawdinator-control-token`, `clawdinator-anthropic-api-key`.
+- Ensure required secrets exist: `clawdinator-github-app.pem`, `clawdinator-discord-token-<n>`, `clawdinator-control-token`, `clawdinator-control-aws-*`, `clawdinator-anthropic-api-key`.
 - Update `nix/hosts/<host>.nix` (Discord allowlist, GitHub App installationId, identity name).
 - Discord must use `messages.queue.byChannel.discord = "interrupt"`; `queue` delays replies to heartbeat and makes the bot appear dead.
 - Ensure `/var/lib/clawd/repos/clawdinators` contains this repo (self-update requires it).

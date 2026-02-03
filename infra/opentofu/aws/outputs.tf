@@ -52,3 +52,15 @@ output "control_api_url" {
   value       = var.control_api_enabled ? aws_lambda_function_url.control[0].function_url : null
   description = "Control-plane API Lambda URL."
 }
+
+output "control_invoker_access_key_id" {
+  value       = var.control_api_enabled ? aws_iam_access_key.control_invoker[0].id : null
+  description = "Access key for control API Lambda invoke user."
+  sensitive   = true
+}
+
+output "control_invoker_secret_access_key" {
+  value       = var.control_api_enabled ? aws_iam_access_key.control_invoker[0].secret : null
+  description = "Secret access key for control API Lambda invoke user."
+  sensitive   = true
+}

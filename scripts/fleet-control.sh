@@ -12,14 +12,16 @@ fi
 
 api_url_file="/etc/clawdinator/control-api-url"
 token_file="/run/agenix/clawdinator-control-token"
+access_key_file="/run/agenix/clawdinator-control-aws-access-key-id"
+secret_key_file="/run/agenix/clawdinator-control-aws-secret-access-key"
 caller_file="/etc/clawdinator/instance-name"
 
-if [ ! -f "${api_url_file}" ]; then
-  echo "Missing control API URL: ${api_url_file}" >&2
-  exit 1
-fi
 if [ ! -f "${token_file}" ]; then
   echo "Missing control API token: ${token_file}" >&2
+  exit 1
+fi
+if [ ! -f "${access_key_file}" ] || [ ! -f "${secret_key_file}" ]; then
+  echo "Missing control AWS credentials in /run/agenix" >&2
   exit 1
 fi
 if [ ! -f "${caller_file}" ]; then
@@ -27,7 +29,6 @@ if [ ! -f "${caller_file}" ]; then
   exit 1
 fi
 
-api_url="$(cat "${api_url_file}")"
 control_token="$(cat "${token_file}")"
 caller="$(cat "${caller_file}")"
 
@@ -48,13 +49,23 @@ payload="$(jq -n \
   --arg target "${target}" \
   --arg caller "${caller}" \
   --arg ami_override "${ami_override}" \
-  '{action: $action, target: $target, caller: $caller, ami_override: $ami_override}')"
+  --arg control_token "${control_token}" \
+  '{action: $action, target: $target, caller: $caller, ami_override: $ami_override, control_token: $control_token}')"
 
-response="$(curl -sS -X POST \
-  -H "X-Clawdinator-Token: ${control_token}" \
-  -H "Content-Type: application/json" \
-  -d "${payload}" \
-  "${api_url}")"
+region="${AWS_REGION:-eu-central-1}"
+export AWS_ACCESS_KEY_ID="$(cat "${access_key_file}")"
+export AWS_SECRET_ACCESS_KEY="$(cat "${secret_key_file}")"
+
+response_file="$(mktemp)"
+aws lambda invoke \
+  --function-name "clawdinator-control-api" \
+  --region "${region}" \
+  --payload "${payload}" \
+  --cli-binary-format raw-in-base64-out \
+  "${response_file}" >/dev/null
+
+response="$(cat "${response_file}")"
+rm -f "${response_file}"
 
 if [ "${action}" = "status" ]; then
   ok="$(printf '%s' "${response}" | jq -r '.ok')"

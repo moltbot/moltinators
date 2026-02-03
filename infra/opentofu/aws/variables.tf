@@ -67,6 +67,12 @@ variable "control_api_name" {
   default     = "clawdinator-control-api"
 }
 
+variable "control_invoker_user_name" {
+  description = "IAM user for invoking the control API Lambda."
+  type        = string
+  default     = "clawdinator-control-invoker"
+}
+
 variable "control_api_token" {
   description = "Bearer token required by the control-plane API."
   type        = string

@@ -88,25 +88,31 @@ exports.handler = async (event) => {
     return unauthorized();
   }
 
-  if (!event.body) {
-    return badRequest('missing body');
-  }
-
-  const body = event.isBase64Encoded
-    ? Buffer.from(event.body, 'base64').toString('utf-8')
-    : event.body;
-
   let payload;
-  try {
-    payload = JSON.parse(body);
-  } catch (err) {
-    return badRequest('invalid json');
+  if (event && typeof event.body === 'string') {
+    const body = event.isBase64Encoded
+      ? Buffer.from(event.body, 'base64').toString('utf-8')
+      : event.body;
+    try {
+      payload = JSON.parse(body);
+    } catch (err) {
+      return badRequest('invalid json');
+    }
+  } else if (event && typeof event === 'object') {
+    payload = event;
+  } else {
+    return badRequest('missing payload');
   }
 
   const action = (payload.action || '').toLowerCase();
   const target = payload.target;
   const caller = payload.caller;
   const amiOverride = payload.ami_override || '';
+  const controlToken = payload.control_token || null;
+
+  if (CONTROL_API_TOKEN && controlToken !== CONTROL_API_TOKEN) {
+    return unauthorized();
+  }
 
   if (action === 'status') {
     try {

@@ -65,6 +65,16 @@ in
       owner = "clawdinator";
       group = "clawdinator";
     };
+    age.secrets."clawdinator-control-aws-access-key-id" = {
+      file = "${secretsPath}/clawdinator-control-aws-access-key-id.age";
+      owner = "clawdinator";
+      group = "clawdinator";
+    };
+    age.secrets."clawdinator-control-aws-secret-access-key" = {
+      file = "${secretsPath}/clawdinator-control-aws-secret-access-key.age";
+      owner = "clawdinator";
+      group = "clawdinator";
+    };
     age.secrets."clawdinator-telegram-bot-token" = {
       file = "${secretsPath}/clawdinator-telegram-bot-token.age";
       owner = "clawdinator";
