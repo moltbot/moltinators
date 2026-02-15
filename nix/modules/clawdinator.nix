@@ -917,9 +917,9 @@ in
         AWS_REGION = cfg.publicS3.region;
         AWS_DEFAULT_REGION = cfg.publicS3.region;
       };
-      path = [ pkgs.awscli2 pkgs.coreutils pkgs.findutils pkgs.util-linux ];
+      path = [ pkgs.bash pkgs.awscli2 pkgs.coreutils pkgs.findutils pkgs.util-linux ];
       script = ''
-        exec ${../../scripts/sync-public-s3-tree.sh} \
+        exec ${pkgs.bash}/bin/bash ${../../scripts/sync-public-s3-tree.sh} \
           ${lib.escapeShellArg cfg.publicS3.sourceDir} \
           ${lib.escapeShellArg cfg.publicS3.bucket} \
           ${lib.escapeShellArg cfg.publicS3.destPrefix} \
