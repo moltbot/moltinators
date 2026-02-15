@@ -86,6 +86,9 @@ in
       group = "clawdinator";
     };
 
+    # Required for CI-driven deploys via AWS Systems Manager.
+    services.amazon-ssm-agent.enable = true;
+
     services.clawdinator = {
       enable = true;
       instanceName = lib.toUpper hostName;
